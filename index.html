@@ -6,396 +6,173 @@
 <title>ys770</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════════════
-   ys770 — personal landing page
-   dark · warm accent · scroll reveals · custom cursor
-   ═══════════════════════════════════════════════════ */
 :root {
-  --bg: #0a0908;
-  --bg2: #111010;
-  --ink: #e8e2d6;
-  --ink-dim: #8a8071;
-  --accent: #c6973a;
-  --accent-dim: #8a6a28;
-  --card-bg: #161413;
-  --card-border: #2a2622;
-  --radius: 8px;
+  --bg: #0a0908; --ink: #e8e2d6; --dim: #7a7264;
+  --accent: #c6973a; --card: #141210; --border: #252220;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
   background: var(--bg); color: var(--ink);
-  font-family: 'Syne', system-ui, -apple-system, sans-serif;
-  overflow-x: hidden;
-  cursor: none;
+  font-family: 'Syne', system-ui, sans-serif;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 2rem;
+  cursor: none; overflow-x: hidden;
 }
 a { color: inherit; text-decoration: none; }
 
-/* ─── Custom cursor ─── */
-.cursor-dot, .cursor-ring {
-  position: fixed; top: 0; left: 0;
-  border-radius: 50%; pointer-events: none; z-index: 9999;
-  transition: transform 0.15s, opacity 0.2s;
+/* Cursor */
+.cdot, .cring {
+  position: fixed; top: 0; left: 0; border-radius: 50%;
+  pointer-events: none; z-index: 9999;
 }
-.cursor-dot {
-  width: 6px; height: 6px; background: var(--accent);
-  transform: translate(-50%, -50%);
+.cdot { width: 5px; height: 5px; background: var(--accent); transform: translate(-50%,-50%); }
+.cring {
+  width: 32px; height: 32px; border: 1.5px solid var(--accent); opacity: 0.4;
+  transform: translate(-50%,-50%);
+  transition: width 0.25s, height 0.25s, opacity 0.25s;
 }
-.cursor-ring {
-  width: 36px; height: 36px;
-  border: 1.5px solid var(--accent);
-  opacity: 0.5;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s, opacity 0.3s, border-color 0.3s;
-}
-body.cursor-hover .cursor-ring {
-  width: 56px; height: 56px; opacity: 0.8;
-  border-color: var(--ink);
-  mix-blend-mode: difference;
-}
-@media (max-width: 768px) { .cursor-dot, .cursor-ring { display: none; } body { cursor: auto; } }
+body.hovering .cring { width: 52px; height: 52px; opacity: 0.7; mix-blend-mode: difference; }
+@media (max-width: 768px) { .cdot, .cring { display: none; } body { cursor: auto; } }
 
-/* ─── Grain overlay ─── */
+/* Grain */
 .grain {
-  position: fixed; inset: 0; pointer-events: none; z-index: 100;
-  opacity: 0.035; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0.03;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-/* ─── Scroll reveal system ─── */
-.reveal {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+/* Layout */
+.container { max-width: 600px; width: 100%; }
+.head {
+  margin-bottom: 2.5rem;
+  opacity: 0; animation: up 0.7s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
 }
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
+.head h1 {
+  font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800;
+  letter-spacing: -0.03em; line-height: 1;
 }
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
-
-/* ─── Hero ─── */
-.hero {
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
-  position: relative;
-  padding: 2rem;
+.head p {
+  color: var(--dim); font-size: 0.82rem; letter-spacing: 0.15em;
+  text-transform: uppercase; margin-top: 0.6rem; font-weight: 400;
 }
-.hero::before {
-  content: "";
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 600px 400px at 30% 40%, rgba(198, 151, 58, 0.06), transparent 60%),
-    radial-gradient(ellipse 500px 300px at 70% 60%, rgba(198, 151, 58, 0.04), transparent 60%);
-  pointer-events: none;
-}
-.hero-name {
-  font-size: clamp(4rem, 15vw, 12rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 0.9;
-  color: var(--ink);
-  position: relative;
-  overflow: hidden;
-}
-.hero-name .char {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(100%);
-  animation: charIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-@keyframes charIn {
-  to { opacity: 1; transform: translateY(0); }
-}
-.hero-sub {
-  font-size: clamp(0.9rem, 1.8vw, 1.15rem);
-  font-weight: 400;
-  color: var(--ink-dim);
-  margin-top: 1.5rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  opacity: 0;
-  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
-}
-@keyframes fadeUp {
+@keyframes up {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.hero-line {
-  width: 40px; height: 2px;
-  background: var(--accent);
-  margin-top: 2.5rem;
-  opacity: 0;
-  animation: lineGrow 0.6s ease-out 1s forwards;
-  transform-origin: center;
-}
-@keyframes lineGrow {
-  from { opacity: 0; transform: scaleX(0); }
-  to { opacity: 1; transform: scaleX(1); }
-}
-.scroll-hint {
-  position: absolute; bottom: 2.5rem;
-  font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--ink-dim);
-  opacity: 0; animation: fadeUp 0.6s ease-out 1.3s forwards;
-}
-.scroll-hint::after {
-  content: ""; display: block;
-  width: 1px; height: 24px;
-  background: var(--accent); margin: 0.6rem auto 0;
-  animation: scrollPulse 1.8s ease-in-out infinite;
-}
-@keyframes scrollPulse {
-  0%, 100% { transform: scaleY(1); opacity: 0.5; }
-  50% { transform: scaleY(1.5); opacity: 1; }
-}
 
-/* ─── Section layout ─── */
-.section {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 6rem 2.5rem;
+/* Card */
+.card {
+  display: block; background: var(--card);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 2rem 2.25rem; position: relative; overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+  opacity: 0; animation: up 0.7s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
 }
-.section-label {
-  font-size: 0.68rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--accent);
-  font-weight: 600;
-  margin-bottom: 3rem;
-  display: flex; align-items: center; gap: 1rem;
+.card::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(198,151,58,0.09), transparent 50%);
+  opacity: 0; transition: opacity 0.4s; pointer-events: none;
 }
-.section-label::after {
-  content: ""; flex: 1; height: 1px;
-  background: linear-gradient(90deg, var(--accent-dim), transparent 60%);
+.card:hover::before { opacity: 1; }
+.card:hover {
+  border-color: var(--accent); transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
 }
-
-/* ─── Project card ─── */
-.project-card {
-  display: block;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 2.5rem 2.75rem;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-  overflow: hidden;
-  transform-style: preserve-3d;
-  perspective: 800px;
+.card-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.card-logo {
+  height: 42px; width: auto;
+  filter: brightness(0) invert(0.88) sepia(0.1);
 }
-.project-card::before {
-  content: "";
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
-    rgba(198, 151, 58, 0.08), transparent 50%);
-  opacity: 0; transition: opacity 0.4s;
-  pointer-events: none;
-}
-.project-card:hover::before { opacity: 1; }
-.project-card:hover {
-  border-color: var(--accent-dim);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(198, 151, 58, 0.15);
-  transform: translateY(-4px);
-}
-.project-card .card-top {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-.project-logo {
-  height: 56px; width: auto;
-  filter: brightness(0) invert(0.9) sepia(0.1);
-  transition: filter 0.3s;
-}
-.project-card:hover .project-logo {
-  filter: brightness(0) invert(0.9) sepia(0.15) hue-rotate(-15deg);
-}
-.project-badge {
-  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.18em;
-  text-transform: uppercase;
+.card-badge {
+  font-size: 0.55rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--bg); background: var(--accent);
-  padding: 0.2rem 0.55rem; border-radius: 2px;
-  align-self: flex-start;
+  padding: 0.15rem 0.5rem; border-radius: 2px; margin-left: auto;
 }
-.project-title {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.75rem;
+.card-title {
+  font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 700;
+  letter-spacing: -0.02em; margin-bottom: 0.5rem;
   transition: color 0.3s;
 }
-.project-card:hover .project-title { color: var(--accent); }
-.project-desc {
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--ink-dim);
-  max-width: 540px;
-  margin-bottom: 1.5rem;
-}
-.project-tags {
-  display: flex; gap: 0.5rem; flex-wrap: wrap;
-  margin-bottom: 1.5rem;
-}
+.card:hover .card-title { color: var(--accent); }
+.card-desc { font-size: 0.95rem; line-height: 1.65; color: var(--dim); margin-bottom: 1.25rem; max-width: 480px; }
+.card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
 .tag {
-  font-size: 0.68rem; font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--ink-dim); border: 1px solid var(--card-border);
-  padding: 0.3rem 0.65rem; border-radius: 20px;
-  transition: border-color 0.2s, color 0.2s;
+  font-size: 0.65rem; font-weight: 500; color: var(--dim);
+  border: 1px solid var(--border); padding: 0.25rem 0.55rem;
+  border-radius: 16px; transition: all 0.2s;
 }
-.project-card:hover .tag { border-color: var(--accent-dim); color: var(--ink); }
-.project-cta {
-  display: inline-flex; align-items: center; gap: 0.6rem;
-  font-size: 0.9rem; font-weight: 600; color: var(--accent);
-  transition: gap 0.3s;
+.card:hover .tag { border-color: rgba(198,151,58,0.4); color: var(--ink); }
+.card-cta {
+  font-size: 0.88rem; font-weight: 600; color: var(--accent);
+  display: inline-flex; align-items: center; gap: 0.5rem;
 }
-.project-card:hover .project-cta { gap: 1rem; }
-.cta-arrow {
-  display: inline-block; transition: transform 0.3s;
-}
-.project-card:hover .cta-arrow { transform: translateX(6px); }
+.card-cta .arrow { transition: transform 0.25s; display: inline-block; }
+.card:hover .card-cta .arrow { transform: translateX(5px); }
 
-/* ─── Footer ─── */
-.footer {
-  padding: 3rem 2.5rem;
-  text-align: center;
-  font-size: 0.78rem;
-  color: var(--ink-dim);
-  border-top: 1px solid var(--card-border);
+/* Footer */
+.foot {
+  margin-top: 3rem; font-size: 0.72rem; color: var(--dim);
+  opacity: 0; animation: up 0.7s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
 }
-.footer a {
-  color: var(--accent); transition: opacity 0.2s;
-}
-.footer a:hover { opacity: 0.7; }
-
-/* ─── Responsive ─── */
-@media (max-width: 768px) {
-  .section { padding: 4rem 1.5rem; }
-  .project-card { padding: 1.75rem 1.5rem; }
-  .project-logo { height: 40px; }
-  .hero-name { letter-spacing: -0.02em; }
-}
+.foot a { color: var(--accent); }
+.foot a:hover { opacity: 0.7; }
 </style>
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
-  <div class="cursor-dot" aria-hidden="true"></div>
-  <div class="cursor-ring" aria-hidden="true"></div>
+  <div class="cdot" aria-hidden="true"></div>
+  <div class="cring" aria-hidden="true"></div>
 
-  <!-- HERO -->
-  <section class="hero">
-    <h1 class="hero-name" id="hero-name">ys770</h1>
-    <p class="hero-sub">building tools for learning</p>
-    <div class="hero-line"></div>
-    <div class="scroll-hint">scroll</div>
-  </section>
+  <div class="container">
+    <div class="head">
+      <h1>ys770</h1>
+      <p>building tools for learning</p>
+    </div>
 
-  <!-- PROJECTS -->
-  <section class="section">
-    <div class="section-label reveal">Projects</div>
-
-    <a href="https://ys770.github.io/PshatGPT/" class="project-card reveal reveal-delay-1" id="pshatgpt-card">
-      <div class="card-top">
-        <img src="https://ys770.github.io/PshatGPT/logo.svg" alt="PshatGPT" class="project-logo" />
-        <span class="project-badge">Preview</span>
+    <a href="https://ys770.github.io/PshatGPT/" class="card" id="card">
+      <div class="card-head">
+        <img src="https://ys770.github.io/PshatGPT/logo.svg" alt="PshatGPT" class="card-logo" />
+        <span class="card-badge">Preview</span>
       </div>
-      <div class="project-title">PshatGPT</div>
-      <p class="project-desc">
-        AI-assisted tzuras hadaf. Click any line of Gemara, Rashi, or Tosafot — Claude streams a contextual explanation. Deep iyun mode, logic chain mapping, all 37 Bavli tractates.
+      <div class="card-title">PshatGPT</div>
+      <p class="card-desc">
+        AI-assisted tzuras hadaf. Click any line of Gemara, Rashi, or Tosafot — Claude explains it in context. Deep iyun mode, logic chain mapping, all 37 Bavli tractates.
       </p>
-      <div class="project-tags">
+      <div class="card-tags">
         <span class="tag">Gemara</span>
         <span class="tag">Claude AI</span>
-        <span class="tag">Sefaria API</span>
-        <span class="tag">Tzuras Hadaf</span>
+        <span class="tag">Sefaria</span>
       </div>
-      <div class="project-cta">
-        Open PshatGPT <span class="cta-arrow">→</span>
+      <div class="card-cta">
+        Open PshatGPT <span class="arrow">→</span>
       </div>
     </a>
-  </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <a href="https://github.com/ys770">github.com/ys770</a>
-  </footer>
+    <div class="foot"><a href="https://github.com/ys770">github.com/ys770</a></div>
+  </div>
 
 <script>
-// ─── Character-by-character hero reveal ───
-(function() {
-  const el = document.getElementById("hero-name");
-  const text = el.textContent;
-  el.innerHTML = "";
-  for (let i = 0; i < text.length; i++) {
-    const span = document.createElement("span");
-    span.className = "char";
-    span.textContent = text[i];
-    span.style.animationDelay = `${0.05 + i * 0.08}s`;
-    el.appendChild(span);
-  }
-})();
-
-// ─── Custom cursor ───
-(function() {
-  const dot = document.querySelector(".cursor-dot");
-  const ring = document.querySelector(".cursor-ring");
-  if (!dot || !ring) return;
-  let mx = 0, my = 0, rx = 0, ry = 0;
-
-  document.addEventListener("mousemove", (e) => {
-    mx = e.clientX; my = e.clientY;
-    dot.style.left = mx + "px";
-    dot.style.top = my + "px";
+// Cursor
+const dot = document.querySelector(".cdot"), ring = document.querySelector(".cring");
+if (dot && ring) {
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener("mousemove", e => { mx=e.clientX; my=e.clientY; dot.style.left=mx+"px"; dot.style.top=my+"px"; });
+  (function anim() { rx+=(mx-rx)*0.14; ry+=(my-ry)*0.14; ring.style.left=rx+"px"; ring.style.top=ry+"px"; requestAnimationFrame(anim); })();
+  document.querySelectorAll("a,button").forEach(el => {
+    el.addEventListener("mouseenter", () => document.body.classList.add("hovering"));
+    el.addEventListener("mouseleave", () => document.body.classList.remove("hovering"));
   });
-
-  // Ring follows with lag
-  function animateRing() {
-    rx += (mx - rx) * 0.15;
-    ry += (my - ry) * 0.15;
-    ring.style.left = rx + "px";
-    ring.style.top = ry + "px";
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-
-  // Hover detection for interactive elements
-  const hoverables = document.querySelectorAll("a, button, .project-card");
-  hoverables.forEach(el => {
-    el.addEventListener("mouseenter", () => document.body.classList.add("cursor-hover"));
-    el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-hover"));
-  });
-})();
-
-// ─── Scroll reveal ───
-(function() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-      }
-    });
-  }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
-  document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
-})();
-
-// ─── Card radial hover glow ───
-(function() {
-  const card = document.getElementById("pshatgpt-card");
-  if (!card) return;
-  card.addEventListener("mousemove", (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-    card.style.setProperty("--mx", x + "%");
-    card.style.setProperty("--my", y + "%");
-  });
-})();
+}
+// Card glow
+const card = document.getElementById("card");
+if (card) card.addEventListener("mousemove", e => {
+  const r = card.getBoundingClientRect();
+  card.style.setProperty("--mx", ((e.clientX-r.left)/r.width*100)+"%");
+  card.style.setProperty("--my", ((e.clientY-r.top)/r.height*100)+"%");
+});
 </script>
 </body>
 </html>
